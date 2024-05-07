@@ -7,10 +7,17 @@ const {getUserId} = require('./utils');
 // リゾルバートをインポート
 const Query = require('./resolvers/Query');
 const Mutation = require('./resolvers/Mutation');
+const Subscription = require('./resolvers/Subscription');
 const User = require('./resolvers/User');
 const Link = require('./resolvers/Link');
+const Vote = require('./resolvers/Vote');
+
+// サブスクリプションの実装
+// Publisher(送信者)/Subscriber(受信者)
+const { PubSub } = require("apollo-server")
 
 const prisma = new PrismaClient();
+const pubsub = new PubSub()
 
 // HackerNewsのデータを格納
 // let links = [
@@ -25,8 +32,10 @@ const prisma = new PrismaClient();
 const resolvers = {
   Query,
   Mutation,
+  Subscription,
   User,
-  Link
+  Link,
+  Vote,
 };
 
 // ApolloServerをインスタンス化
@@ -40,6 +49,7 @@ const server = new ApolloServer({
     return {
       ...req,
       prisma,
+      pubsub,
       userId: req && req.headers.authorization ? getUserId(req) : null
     } 
   }
